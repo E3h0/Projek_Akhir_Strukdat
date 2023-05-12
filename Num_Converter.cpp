@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <cmath>
+#include <string>
 
 using namespace std;
 
@@ -28,27 +30,71 @@ class Stack {
 		}
 };
 
-class Queue{
-	private: 
-		vector<int> dt;
-	public: 
-		void push(int n){
-			dt.push_back(n);
-		}
-		int pop(){
-			int n = dt.front();
-			dt.erase(dt.begin());
-			return n;
-		}
-		int front(){
-			return dt.front();
-		}
-		int size(){
-			return dt.size();
-		}
-		bool empty(){
-			return dt.empty();
-		}
+template <class T>
+class Queue {
+private:
+    struct Node {
+        T data;
+        Node* next;
+        Node(T value) : data(value), next(nullptr) {}
+    };
+
+    Node* frontNode;
+    Node* rearNode;
+    int count;
+
+public:
+    Queue() : frontNode(nullptr), rearNode(nullptr), count(0) {}
+
+    ~Queue() {
+        while (!isEmpty()) {
+            dequeue();
+        }
+    }
+
+    void enqueue(T value) {
+        Node* newNode = new Node(value);
+        if (isEmpty()) {
+            frontNode = newNode;
+            rearNode = newNode;
+        } else {
+            rearNode->next = newNode;
+            rearNode = newNode;
+        }
+        count++;
+    }
+
+    void dequeue() {
+        if (isEmpty()) {
+            cout << "Queue is empty. Cannot dequeue." << endl;
+            return;
+        }
+
+        Node* temp = frontNode;
+        frontNode = frontNode->next;
+        delete temp;
+        count--;
+
+        if (isEmpty()) {
+            rearNode = nullptr;
+        }
+    }
+
+    T front() {
+        if (isEmpty()) {
+            cout << "Queue is empty. No front element." << endl;
+            exit(1);
+        }
+        return frontNode->data;
+    }
+
+    bool isEmpty() {
+        return count == 0;
+    }
+
+    int size() {
+        return count;
+    }
 };
 
 // Class untuk Konversi bilangan
@@ -63,9 +109,9 @@ class Converter{
 
 				// koversi digit ke ascii
 				if(remainder < 10){
-					st.push(remainder + '0');
+					st.push(static_cast<char>(remainder + 48));
 				}else{
-					st.push(remainder + 55);
+					st.push(static_cast<char>(remainder + 55));
 				}
 				dec/=16;
 			}
@@ -77,26 +123,31 @@ class Converter{
 			return res;
 		}
 		// Heksadesimal ke Decimal
-		int HexToDec(string hex){
-			Queue qu;
-			for(int i = 2; i < hex.length(); i++){
-				if(hex[i] >= '0' && hex[i] <= '9'){
-					qu.push(hex[i] - '0');
-				}
-				else{
-					qu.push(hex[i] - 55);
-				}
-			}
-			int dec = 0;
-			int pow = 1;
+		int HexToDec(const string& hexadecimal) {
+		    Queue<char> hexQueue;
+		    for (char c : hexadecimal) {
+		        hexQueue.enqueue(c);
+		    }
 
-			// Ubah digit heksa ke desimal
-			while(!qu.empty()){
-				dec += qu.front() * pow;
-				qu.pop();
-				pow *= 16;
-			}
-			return dec;
+		    int decimal = 0;
+		    int power = hexadecimal.length() - 1;
+
+		    while (!hexQueue.isEmpty()) {
+		        char digit = hexQueue.front();
+		        hexQueue.dequeue();
+
+		        int value;
+		        if (isdigit(digit)) {
+		            value = digit - '0';
+		        } else {
+		            value = toupper(digit) - 'A' + 10;
+		        }
+
+		        decimal += value * pow(16, power);
+		        power--;
+		    }
+
+		    return decimal;
 		}
 };
 
@@ -104,12 +155,17 @@ class Converter{
 // Entry Point Driver
 int main(){
 	Converter conv;
-	int dec=13;
-	string hex = "0xD";
-	string res;
-	int res1;
-	res = conv.DecToHex(dec);
-	res1 = conv.HexToDec(hex);
-	cout << res << endl;
-	cout << res1 << endl;
+	
+	int dec = 218;
+	string res1 = conv.DecToHex(dec);
+
+	int dec2 = 173;
+	string res2 = conv.DecToHex(dec2);
+	
+	string hex = "da";
+	int res = conv.HexToDec(hex);
+
+	cout << "res = " << res << endl;
+	cout << "res1 = " << res1 << endl;
+	cout << "res2 = " << res2 << endl;
 }
