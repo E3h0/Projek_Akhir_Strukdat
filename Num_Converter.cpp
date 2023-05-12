@@ -149,6 +149,44 @@ class Converter{
 
 		    return decimal;
 		}
+	
+	//Decimal To Biner
+	int DecToBin(int n){
+		Stack st; int tmp; int bin =0; 
+		//convert; 
+		while(n!= 0){
+			tmp = n%2;
+			st.push(tmp); 
+			n = n/2; 
+		}
+		    // cetak; 
+		while(!st.empty()){
+		        bin= bin*10 +st.pop();
+		    }
+		
+		return bin; 
+		
+	}
+	
+	//Biner To Decimal
+	int BinToDec(int n){
+	    Queue<int> qu; int tmp; 
+	    while(n!=0 ){
+	        tmp = n%10; 
+	        qu.enqueue(tmp); 
+	        n= n/10; 
+	    }
+	    
+	    //cetak decimal
+	    int dec =0; int i= 0; int x;  
+	    while(!qu.isEmpty()){
+	        x= qu.front();
+	        dec =dec+ x*pow(2,i); 
+	        i++;
+	        qu.dequeue();
+	    }
+	    return dec;
+	}
 };
 
 
@@ -164,8 +202,12 @@ int main(){
 	
 	string hex = "da";
 	int res = conv.HexToDec(hex);
-
+	int res3 = conv.DecToBin(dec2);
+	int res4 = conv.BinToDec(res3);
+	
 	cout << "res = " << res << endl;
 	cout << "res1 = " << res1 << endl;
 	cout << "res2 = " << res2 << endl;
+	cout<< "res3 = " <<res3<<endl;
+	cout<<"res4 = "<<res4<<endl;
 }
