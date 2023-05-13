@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 #include <algorithm>
 #include <cmath>
 #include <string>
@@ -7,9 +6,119 @@
 using namespace std;
 
 // Class Untuk Implementasi Struktur Data
+template <typename T>
+class Vector {
+private:
+    T* data;
+    int capacity;
+    int size;
+
+public:
+    Vector() : data(nullptr), capacity(0), size(0) {}
+
+    ~Vector() {
+        delete[] data;
+    }
+
+    void push_back(const T& value) {
+        if (size == capacity) {
+            int newCapacity = (capacity == 0) ? 1 : capacity * 2;
+            T* newData = new T[newCapacity];
+            
+            for (int i = 0; i < size; i++) {
+                newData[i] = data[i];
+            }
+            
+            delete[] data;
+            data = newData;
+            capacity = newCapacity;
+        }
+        
+        data[size] = value;
+        size++;
+    }
+
+    T& operator[](int index) {
+        if (index >= 0 && index < size) {
+            return data[index];
+        }
+        throw std::out_of_range("Index out of range");
+    }
+
+    const T& operator[](int index) const {
+        if (index >= 0 && index < size) {
+            return data[index];
+        }
+        throw std::out_of_range("Index out of range");
+    }
+
+    T front() const {
+        if (size > 0) {
+            return data[0];
+        }
+        throw std::out_of_range("Vector is empty");
+    }
+
+    T back() const {
+        if (size > 0) {
+            return data[size - 1];
+        }
+        throw std::out_of_range("Vector is empty");
+    }
+
+    void pop_back() {
+        if (size > 0) {
+            size--;
+        } else {
+            throw std::out_of_range("Vector is empty");
+        }
+    }
+
+    void erase(T index) {
+        if (index >= 0 && index < size) {
+            for (T i = index; i < size - 1; i++) {
+                data[i] = data[i + 1];
+            }
+            size--;
+        } else {
+            throw std::out_of_range("Index out of range");
+        }
+    }
+
+    bool empty() const {
+        return (size == 0);
+    }
+
+    void clear() {
+        delete[] data;
+        data = nullptr;
+        capacity = 0;
+        size = 0;
+    }
+    int getSize() const {
+        return size;
+    }
+
+    T* begin() {
+        return data;
+    }
+
+    const T* begin() const {
+        return data;
+    }
+
+    T* end() {
+        return data + size;
+    }
+
+    const T* end() const {
+        return data + size;
+    }
+};
+
 class Stack {
 	private:
-		vector<int> dt;
+		Vector<int> dt;
 	public:
 		void push(int n){
 			dt.push_back(n);
@@ -23,7 +132,7 @@ class Stack {
 			return dt.back();
 		}
 		int size(){
-			return dt.size();
+			return dt.getSize();
 		}
 		bool empty(){
 			return dt.empty();
@@ -126,7 +235,8 @@ class Converter{
 		int HexToDec(const string& hexadecimal) {
 		    Queue<char> hexQueue;
 		    for (char c : hexadecimal) {
-		        hexQueue.enqueue(c);
+		    	char hex = toupper(c);
+		        hexQueue.enqueue(hex);
 		    }
 
 		    int decimal = 0;
@@ -187,27 +297,130 @@ class Converter{
 	    }
 	    return dec;
 	}
+
+	//Decimal ke Octal
+	string DecToOc(int input) {
+        Stack octalStack;
+        string keluaran = "";
+
+        while (input > 0) {
+            int sisa = input % 8;
+            octalStack.push(sisa);            
+            input /= 8;
+        }
+
+        while (!octalStack.empty()) {
+            keluaran += to_string(octalStack.top());
+            octalStack.pop();
+        }
+        return keluaran;
+    }
+
+    //Octal ke Decimal
+    string OcToDec(int input) {
+        int sisa = 0;
+        int hasil = 0;
+
+        for(int i = 0; input > 0; ++i){
+            sisa = input % 10;
+            if (sisa == 8 || sisa == 9){
+                cout << "Angka tidak valid!" << endl;
+                break;
+            }
+            hasil += sisa * pow(8, i);
+            input /= 10;
+        }
+        
+        string keluaran = to_string(hasil);
+
+        if(sisa == 8 || sisa == 9){
+            return 0;
+        }else{
+            return keluaran;
+        }
+    }
+
 };
 
 
 // Entry Point Driver
 int main(){
 	Converter conv;
-	
-	int dec = 218;
-	string res1 = conv.DecToHex(dec);
+begin: 
+	int ops, input, bin, dec;
+	string hex, octal, decs;
+	char ask;
+	cout << "Pilih menu berikut untuk melakukan konversi:\n";
+	cout << "1. Desimal To Any Format\n";
+    cout << "2. Biner To Any Format\n";
+    cout << "3. Oktal To Any Format\n";
+    cout << "4. Heksadesimal To Any Format\n";
+    cout << "Masukkan menu yang dipilih (cukup angkanya saja): ";
+    cin >> ops;
 
-	int dec2 = 173;
-	string res2 = conv.DecToHex(dec2);
-	
-	string hex = "da";
-	int res = conv.HexToDec(hex);
-	int res3 = conv.DecToBin(dec2);
-	int res4 = conv.BinToDec(res3);
-	
-	cout << "res = " << res << endl;
-	cout << "res1 = " << res1 << endl;
-	cout << "res2 = " << res2 << endl;
-	cout<< "res3 = " <<res3<<endl;
-	cout<<"res4 = "<<res4<<endl;
+	switch(ops){
+		case 1: 
+			cout << "Masukkan bilangan desimal: ";
+			cin >> input;
+			cout << endl;
+			cout << "=========HASIL===========\n";
+			bin = conv.DecToBin(input); 
+			cout << "Binary = " << bin << endl;
+			octal = conv.DecToOc(input); 
+			cout << "octal = " << octal << endl;
+			hex = conv.DecToHex(input); 
+			cout << "Heksadesimal = " << hex << endl;
+			cout << "=========================\n" << endl;
+			break;
+		case 2:
+			cout << "Masukkan bilangan biner: ";
+			cin >> input;
+			cout << endl;
+			cout << "=========HASIL===========\n";
+			dec = conv.BinToDec(input); 
+			cout << "Decimal = " << dec << endl;
+			octal = conv.DecToOc(dec); 
+			cout << "Octal = " << octal << endl;
+			hex = conv.DecToHex(dec); 
+			cout << "Heksadesimal = " << hex << endl;
+			cout << "=========================\n" << endl;
+			break;
+		case 3:
+			cout << "Masukkan bilangan octal: ";
+			cin >> input;
+			cout << endl;
+			cout << "=========HASIL===========\n";
+			decs = conv.OcToDec(input); 
+			cout << "Decimal = " << decs << endl;
+			bin = conv.DecToBin(dec); 
+			cout << "Binary = " << bin << endl;
+			hex = conv.DecToHex(dec); 
+			cout << "Heksadesimal = " << hex << endl;
+			cout << "=========================\n" << endl;
+			break;
+		case 4:
+			cout << "Masukkan bilangan heksa (tanpa 0x): ";
+			cin >> hex;
+			cout << endl;
+			cout << "=========HASIL===========\n";
+			dec = conv.HexToDec(hex); 
+			cout << "Decimal = " << dec << endl;
+			octal = conv.DecToOc(dec); 
+			cout << "Octal = " << octal << endl;
+			bin = conv.DecToBin(dec); 
+			cout << "Binary = " << bin << endl;
+			cout << "=========================\n" << endl;
+			break;
+		default: 
+			cout << "Menu yang dipilih tidak valid!!!" << endl;
+			break;
+	}
+	cout << "Apakah anda ingin melanjutkan konversi? (y/n)" << endl;
+    fflush(stdin);
+    cin >> ask;
+    if(ask=='y'||ask=='Y')
+        goto begin;
+    else
+        cout << "Terima Kasih <3";
+    return 0;
 }
