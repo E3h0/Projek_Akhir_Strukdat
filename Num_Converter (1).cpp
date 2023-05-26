@@ -127,7 +127,7 @@ public:
         left++;
         right--;
     }
-}
+    }
 
 };
 
@@ -288,6 +288,11 @@ class Converter{
         // Pembalikan urutan bit biner
         binary.reverse();
 
+        for (int i = 0; i < binary.getSize(); i++) {
+                cout << binary[i];
+        }
+        cout << endl;
+
         return binary;
     }
 
@@ -350,7 +355,6 @@ class Converter{
 
 };
 
-
 // Entry Point Driver
 int main(){
 	Converter conv;
@@ -375,10 +379,7 @@ begin:
 			cout << endl;
 			cout << "=========HASIL===========\n";
 			cout << "Binary = ";
-            for (int i = 0; i < ner.getSize(); i++) {
-                    cout << ner[i];
-            }
-            cout << endl;
+            conv.DecToBin(input);
 			octal = conv.DecToOc(input); 
 			cout << "octal = " << octal << endl;
 			hex = conv.DecToHex(input); 
@@ -412,13 +413,10 @@ begin:
 			cout << endl;
 			cout << "=========HASIL===========\n";
 			decs = conv.OcToDec(input); 
+            dec = stoi(decs);
 			cout << "Decimal = " << decs << endl;
-			ner = conv.DecToBin(dec);
-            for (int i = 0; i < ner.getSize(); i++) {
-                if(ner[i] == 0 || ner[i] == 1)
-                    cout << ner[i];
-            }
-            cout << endl;
+            cout << "Biner = ";
+			conv.DecToBin(dec);
 			hex = conv.DecToHex(dec); 
 			cout << "Heksadesimal = " << hex << endl;
 			cout << "=========================\n" << endl;
@@ -430,14 +428,10 @@ begin:
 			cout << "=========HASIL===========\n";
 			dec = conv.HexToDec(hex); 
 			cout << "Decimal = " << dec << endl;
+            cout << "Biner = ";
+			conv.DecToBin(dec);
 			octal = conv.DecToOc(dec); 
 			cout << "Octal = " << octal << endl;
-			ner = conv.DecToBin(dec); 
-            for (int i = 0; i < ner.getSize(); i++) {
-                if(ner[i] == 0 || ner[i] == 1)
-                    cout << ner[i];
-            }
-            cout << endl;
 			cout << "=========================\n" << endl;
 			break;
 		default: 
